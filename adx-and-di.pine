@@ -1,0 +1,30 @@
+//@version=6
+indicator("ADX & DI", shorttitle="ADX & DI", overlay=false)
+// Input parameters
+int adxlen = input.int(14, title="ADX Smoothing")
+int dilen = input.int(14, title="DI Length")
+int threshold = input.int(20, title="Threshold")
+// Function to calculate Directional Movement
+dirmov(len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    plusDM = nz(up, 0) > nz(down, 0) and nz(up, 0) > 0 ? nz(up, 0) : 0
+    minusDM = nz(down, 0) > nz(up, 0) and nz(down, 0) > 0 ? nz(down, 0) : 0
+    truerange = ta.rma(ta.tr, len)
+    plus = na(100 * ta.rma(plusDM, len) / truerange) ? 0 : 100 * ta.rma(plusDM, len) / truerange
+    minus = na(100 * ta.rma(minusDM, len) / truerange) ? 0 : 100 * ta.rma(minusDM, len) / truerange
+    [plus, minus]
+// Function to calculate ADX
+adx(dilen, adxlen) =>
+    [plusDI, minusDI] = dirmov(dilen)
+    sum = plusDI + minusDI
+    adxVal = 100 * ta.rma(math.abs(plusDI - minusDI) / (sum == 0 ? 1 : sum), adxlen)
+    adxVal
+// Calculate indicators
+[plusDI, minusDI] = dirmov(dilen)
+adxValue = adx(dilen, adxlen)
+// Plotting
+plot(plusDI, color=color.green, title="PlusDI")
+plot(minusDI, color=color.red, title="MinusDI")
+plot(adxValue, color=color.white, title="ADX")
+hline(threshold, color=color.white, linestyle=hline.style_dashed)
