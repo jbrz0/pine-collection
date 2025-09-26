@@ -1,0 +1,29 @@
+//@version=6
+indicator("ATR Line", overlay=true)
+
+int nATRPeriod = input.int(5, "ATR Period")
+float nATRMultip = input.float(3.5, "ATR Multiplier")
+
+float xATR = ta.atr(nATRPeriod)
+float nLoss = nATRMultip * xATR
+
+float xATRTrailingStop = na
+xATRTrailingStop := if close > (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1]) and (na(close[1]) ? false : close[1] > (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1]))
+    math.max(na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1], close - nLoss)
+else if close < (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1]) and (na(close[1]) ? false : close[1] < (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1]))
+    math.min(na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1], close + nLoss)
+else if close > (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1])
+    close - nLoss
+else
+    close + nLoss
+
+int pos = na
+pos := if (na(close[1]) ? false : close[1] < (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1])) and close > (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1])
+    1
+else if (na(close[1]) ? false : close[1] > (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1])) and close < (na(xATRTrailingStop[1]) ? 0. : xATRTrailingStop[1])
+    -1
+else
+    na(pos[1]) ? 0 : pos[1]
+
+color col = pos == -1 ? color.red : pos == 1 ? color.green : color.blue
+plot(xATRTrailingStop, color=col, title="ATR Line")

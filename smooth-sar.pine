@@ -1,0 +1,75 @@
+//@version=6
+indicator("Smooth SAR", shorttitle="Smooth SAR", overlay=true)
+
+// --- Inputs ---
+AF_initial = input.float(0.02, "AF Initial")
+AF_increment = input.float(0.02, "AF Increment")
+AF_maximum = input.float(0.2, "AF Maximum")
+
+// --- State Initialization ---
+// `var` declares the variables on the first bar and their values persist.
+// This is the core of the state management in v6.
+var bool uptrend = true
+var bool newtrend = false
+var float EP = high
+var float SAR = low
+var float AF = AF_initial
+
+// --- Main Smoothing ---
+if bar_index > 0
+    _uptrend = uptrend[1]
+    _newtrend = newtrend[1]
+    _EP = EP[1]
+    _SAR = SAR[1]
+    _AF = AF[1]
+
+    // Step 1: Determine the Extreme Point (EP)
+    if _uptrend
+        EP := math.max(high, _EP)
+    else
+        EP := math.min(low, _EP)
+
+    // Step 2: Determine the Acceleration Factor (AF)
+    if _newtrend
+        AF := AF_initial
+    else
+        if EP != _EP
+            AF := math.min(AF_maximum, _AF + AF_increment)
+        else
+            AF := _AF
+
+    // Step 3: Calculate the candidate SAR
+    _currentSAR = _SAR + AF * (EP - _SAR)
+
+    // Step 4: Apply clamping and check for trend reversal
+    if _uptrend
+        _currentSAR := math.min(_currentSAR, low[1])
+        if not na(low[2])
+            _currentSAR := math.min(_currentSAR, low[2])
+        
+        if _currentSAR > low
+            uptrend := false
+            newtrend := true
+            SAR := math.max(high, _EP)
+            EP := math.min(low, low[1])
+        else
+            uptrend := true
+            newtrend := false
+            SAR := _currentSAR
+    else // Downtrend
+        _currentSAR := math.max(_currentSAR, high[1])
+        if not na(high[2])
+            _currentSAR := math.max(_currentSAR, high[2])
+        
+        if _currentSAR < high
+            uptrend := true
+            newtrend := true
+            SAR := math.min(low, _EP)
+            EP := math.max(high, high[1])
+        else
+            uptrend := false
+            newtrend := false
+            SAR := _currentSAR
+
+// --- Plotting ---
+plot(SAR, title="SAR", color=color.blue, style=plot.style_cross, linewidth=2)

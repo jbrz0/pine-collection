@@ -1,0 +1,108 @@
+//@version=6
+indicator("Stochastic Ribbon", shorttitle="SR", overlay=true)
+
+// --- Inputs ---
+theme = input.string("Theme 2", "Theme", options=["Theme 1", "Theme 2", "Theme 3"])
+length = input.int(14, "Length", minval=1)
+start = input.int(1, "Start", minval=1)
+plotNumber = input.int(10, "No. of plots", minval=1, maxval=10)
+
+// --- Color Setup ---
+colour1 = color.new(color.green, 80)
+colour2 = color.new(color.red, 80)
+colour3 = color.new(color.teal, 80)
+colour4 = color.new(color.purple, 80)
+colour5 = color.new(color.silver, 90)
+colour6 = color.new(#353535, 60)
+colour7 = color.new(color.blue, 80)
+colour8 = color.new(color.yellow, 80)
+colour9 = color.new(color.white, 90)
+
+c1 = theme == "Theme 1" ? colour1 : theme == "Theme 2" ? colour3 : colour5
+c2 = theme == "Theme 1" ? colour2 : theme == "Theme 2" ? colour4 : colour6
+c3 = theme == "Theme 1" ? colour7 : theme == "Theme 2" ? colour8 : colour9
+
+// --- Calculations ---
+count = length * start
+
+// Line 1
+high1 = plotNumber >= 1 ? ta.highest(high, count + length * 0) : na
+low1 = plotNumber >= 1 ? ta.lowest(low, count + length * 0) : na
+avg1 = plotNumber >= 1 ? math.avg(low1, high1) : na
+// Line 2
+high2 = plotNumber >= 2 ? ta.highest(high, count + length * 1) : na
+low2 = plotNumber >= 2 ? ta.lowest(low, count + length * 1) : na
+avg2 = plotNumber >= 2 ? math.avg(low2, high2) : na
+// Line 3
+high3 = plotNumber >= 3 ? ta.highest(high, count + length * 2) : na
+low3 = plotNumber >= 3 ? ta.lowest(low, count + length * 2) : na
+avg3 = plotNumber >= 3 ? math.avg(low3, high3) : na
+// Line 4
+high4 = plotNumber >= 4 ? ta.highest(high, count + length * 3) : na
+low4 = plotNumber >= 4 ? ta.lowest(low, count + length * 3) : na
+avg4 = plotNumber >= 4 ? math.avg(low4, high4) : na
+// Line 5
+high5 = plotNumber >= 5 ? ta.highest(high, count + length * 4) : na
+low5 = plotNumber >= 5 ? ta.lowest(low, count + length * 4) : na
+avg5 = plotNumber >= 5 ? math.avg(low5, high5) : na
+// Line 6
+high6 = plotNumber >= 6 ? ta.highest(high, count + length * 5) : na
+low6 = plotNumber >= 6 ? ta.lowest(low, count + length * 5) : na
+avg6 = plotNumber >= 6 ? math.avg(low6, high6) : na
+// Line 7
+high7 = plotNumber >= 7 ? ta.highest(high, count + length * 6) : na
+low7 = plotNumber >= 7 ? ta.lowest(low, count + length * 6) : na
+avg7 = plotNumber >= 7 ? math.avg(low7, high7) : na
+// Line 8
+high8 = plotNumber >= 8 ? ta.highest(high, count + length * 7) : na
+low8 = plotNumber >= 8 ? ta.lowest(low, count + length * 7) : na
+avg8 = plotNumber >= 8 ? math.avg(low8, high8) : na
+// Line 9
+high9 = plotNumber >= 9 ? ta.highest(high, count + length * 8) : na
+low9 = plotNumber >= 9 ? ta.lowest(low, count + length * 8) : na
+avg9 = plotNumber >= 9 ? math.avg(low9, high9) : na
+// Line 10
+high10 = plotNumber >= 10 ? ta.highest(high, count + length * 9) : na
+low10 = plotNumber >= 10 ? ta.lowest(low, count + length * 9) : na
+avg10 = plotNumber >= 10 ? math.avg(low10, high10) : na
+
+// --- Plotting ---
+plot(high1, "High 1", c1)
+plot(low1, "Low 1", c2)
+plot(avg1, "Avg 1", c3)
+
+plot(high2, "High 2", c1)
+plot(low2, "Low 2", c2)
+plot(avg2, "Avg 2", c3)
+
+plot(high3, "High 3", c1)
+plot(low3, "Low 3", c2)
+plot(avg3, "Avg 3", c3)
+
+plot(high4, "High 4", c1)
+plot(low4, "Low 4", c2)
+plot(avg4, "Avg 4", c3)
+
+plot(high5, "High 5", c1)
+plot(low5, "Low 5", c2)
+plot(avg5, "Avg 5", c3)
+
+plot(high6, "High 6", c1)
+plot(low6, "Low 6", c2)
+plot(avg6, "Avg 6", c3)
+
+plot(high7, "High 7", c1)
+plot(low7, "Low 7", c2)
+plot(avg7, "Avg 7", c3)
+
+plot(high8, "High 8", c1)
+plot(low8, "Low 8", c2)
+plot(avg8, "Avg 8", c3)
+
+plot(high9, "High 9", c1)
+plot(low9, "Low 9", c2)
+plot(avg9, "Avg 9", c3)
+
+plot(high10, "High 10", c1)
+plot(low10, "Low 10", c2)
+plot(avg10, "Avg 10", c3)
