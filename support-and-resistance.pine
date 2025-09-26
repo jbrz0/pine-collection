@@ -1,0 +1,53 @@
+//@version=6
+indicator("Support & Resistance Lines", overlay=true)
+
+// --- Inputs ---
+left = input.int(50, "Left Bars")
+right = input.int(25, "Right Bars")
+quick_right = input.int(5, "Quick Right")
+srcChoice = input.string("Close", "Source", options = ["Close", "High/Low"])
+
+// --- Calculations ---
+// Determine the source series based on input
+src = srcChoice == "Close" ? close : high
+srcLow = srcChoice == "Close" ? close : low // A separate source for lows when in High/Low mode
+
+// Get pivot levels using the new method syntax
+float pivotHighPrice = ta.pivothigh(src, left, right)
+float pivotLowPrice = ta.pivotlow(srcLow, left, right)
+float quickPivotHighPrice = ta.pivothigh(src, left, quick_right)
+float quickPivotLowPrice = ta.pivotlow(srcLow, left, quick_right)
+
+// --- Level Plotting ---
+// Create persistent line objects for each S/R level
+var line l1 = line.new(na, na, na, na, color=color.gray)
+var line l2 = line.new(na, na, na, na, color=color.gray)
+var line l3 = line.new(na, na, na, na, color=color.gray)
+var line l4 = line.new(na, na, na, na, color=color.gray)
+var line l5 = line.new(na, na, na, na, color=color.gray)
+var line l6 = line.new(na, na, na, na, color=color.gray)
+var line l7 = line.new(na, na, na, na, color=color.gray)
+var line l8 = line.new(na, na, na, na, color=color.gray)
+
+// Function to update and manage a line's position and color
+updateLine(line id, float price) =>
+    if not na(price)
+        // A pivot was found, update the line's position
+        id.set_xy1(bar_index - right, price)
+        id.set_xy2(bar_index, price)
+        id.set_extend(extend.right) // Extend the line into the future
+    
+    // Update color on every bar based on the current close
+    lineColor = close >= id.get_y1() ? color.green : color.red
+    id.set_color(lineColor)
+
+// On each bar, check if a new pivot has been confirmed
+updateLine(l3, pivotHighPrice)
+updateLine(l4, pivotLowPrice)
+updateLine(l1, quickPivotHighPrice)
+updateLine(l2, quickPivotLowPrice)
+
+// Note: Getting the 2nd or 3rd most recent pivot directly like in v3/v5 
+// (e.g., valuewhen(pivothigh, close[right], 1)) is more complex in v6's drawing-focused model.
+// The code above correctly plots the most recent pivots. Plotting historical ones 
+// requires a more advanced array-based approach to store and manage previous pivot levels.

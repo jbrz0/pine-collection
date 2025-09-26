@@ -1,0 +1,80 @@
+//@version=6
+indicator("jbrz0 sniper", overlay=true, shorttitle="jbrz0snipe")
+
+// —————— Inputs ——————
+// Channel
+len_channel = input.int(8, "SMA Length", minval=1)
+src_channel = input.source(close, "Source")
+show_bar_channel = input.bool(false, "Bar Channel On/Off")
+
+// EMA Trend
+len_ema = input.int(13, "Trend Change EMA Length", minval=1)
+
+// Supertrend
+factor_st = input.float(1, "Trend Transition Signal (Factor)", minval=1)
+pd_st = input.int(1, "ATR Period", minval=1)
+
+// Support / Resistance
+len_sr = input.int(21, "S/R Length", minval=1)
+
+// —————— Calculations & Plots ——————
+
+// == Channel ==
+sma_channel = ta.sma(src_channel, len_channel)
+highest_bars = ta.highest(close, 13)
+lowest_bars = ta.lowest(close, 13)
+// plot(show_bar_channel ? highest_bars : na, "Candle Body Resistance", color.new(color.black, 0), 1, plot.style_linebr)
+// plot(show_bar_channel ? lowest_bars : na, "Candle Body Support", color.new(color.black, 0), 1, plot.style_linebr)
+
+// == EMA Trend Color ==
+ema_trend = ta.ema(close, len_ema)
+ema_color = ema_trend >= ema_trend[2] ? color.new(#01F061, 0) : color.new(#E61F44, 0)
+// plot(ema_trend, "Trend EMA", ema_color, 1)
+
+// == Signal 1: TEMA/DEMA Cross Arrows ==
+slow = 8
+fast = 5
+
+vh1 = ta.ema(ta.highest(math.avg(low, close), fast), 5)
+vl1 = ta.ema(ta.lowest(math.avg(high, close), slow), 8)
+
+tema = ta.ema(close, 1) * 3 - ta.ema(ta.ema(close, 1), 1) * 3 + ta.ema(ta.ema(ta.ema(close, 1), 1), 1)
+dema = 2 * ta.ema(close, 8) - ta.ema(ta.ema(close, 8), 5)
+
+signal = tema > dema ? math.max(vh1, vl1) : math.min(vh1, vl1)
+is_call = tema > dema and signal > low and (signal - signal[1] > signal[1] - signal[2])
+is_put = tema < dema and signal < high and (signal[1] - signal > signal[2] - signal[1])
+// if is_call
+//     label.new(bar_index, low, "*BUY*", color=color.new(#01F061, 0), textcolor=color.white, style=label.style_arrowup, yloc=yloc.belowbar)
+// if is_put
+//     label.new(bar_index, high, "*SELL*", color=color.new(#E61F44, 0), textcolor=color.white, style=label.style_arrowdown, yloc=yloc.abovebar)
+
+// == Signal 2: Supertrend Arrows ==
+up_st = hl2 - (factor_st * ta.atr(pd_st))
+dn_st = hl2 + (factor_st * ta.atr(pd_st))
+
+var float trendUp_st = na
+var float trendDown_st = na
+var int trend_st = 0
+
+trendUp_st := close[1] > trendUp_st[1] ? math.max(up_st, trendUp_st[1]) : up_st
+trendDown_st := close[1] < trendDown_st[1] ? math.min(dn_st, trendDown_st[1]) : dn_st
+trend_st := close > trendDown_st[1] ? 1 : close < trendUp_st[1] ? -1 : nz(trend_st[1], 0)
+
+buy_signal_st = trend_st == 1 and trend_st[1] == -1
+sell_signal_st = trend_st == -1 and trend_st[1] == 1
+
+plotarrow(buy_signal_st ? 1 : na, title="Up Entry Arrow", colorup=color.new(#01f061, 60), maxheight=1000)
+plotarrow(sell_signal_st ? -1 : na, title="Down Entry Arrow", colordown=color.new(#E61F44, 60), maxheight=1000)
+
+// == Support / Resistance Lines ==
+rstt = ta.valuewhen(high >= ta.highest(high, len_sr), high, 0)
+rstb = ta.valuewhen(low <= ta.lowest(low, len_sr), low, 0)
+// plot(rstt, "Resistance", rstt != rstt[1] ? na : color.new(#E61F44, 0), 1)
+// plot(rstb, "Support", rstb != rstb[1] ? na : color.new(#01F061, 0), 1)
+
+// —————— Alerts ——————
+// alertcondition(is_call, "BUY", "Entry Signal Buy")
+// alertcondition(is_put, "SELL", "Entry Signal Sell")
+alertcondition(buy_signal_st, "BUY", "Buy Arrow")
+alertcondition(sell_signal_st, "SELL", "Sell Arrow")
