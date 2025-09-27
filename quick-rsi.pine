@@ -1,0 +1,46 @@
+//@version=6
+indicator("Quick RSI", shorttitle="Quick RSI")
+
+int rsiLength = input.int(10, "RSI Length", minval=1)
+int smoothingLength = input.int(8, "Smoothing Length", minval=1)
+float obosLevel = input.float(2.0, "Overbought / Oversold Level", minval=0.0)
+bool applyNormalization = input.bool(false, "Apply Normalization to [-100, 100] values ?")
+src = input.source(close, "Source")
+
+float PI = 2 * math.asin(1)
+
+float a1 = math.exp(-1.414 * PI / smoothingLength)
+float b1 = 2 * a1 * math.cos(1.414 * math.pi / smoothingLength)
+float c2 = b1
+float c3 = -a1 * a1
+float c1 = 1 - c2 - c3
+
+float mom = ta.change(src, rsiLength - 1)
+
+float ssf = na
+ssf := c1 * (mom + nz(mom[1])) / 2 + c2 * nz(ssf[1]) + c3 * nz(ssf[2])
+
+float ssfChange = ta.change(ssf)
+float upSum = math.sum(ssfChange > 0 ? ssfChange : 0.0, rsiLength)
+float downSum = math.sum(ssfChange > 0 ? 0.0 : math.abs(ssfChange), rsiLength)
+
+float tmpRSI = na
+tmpRSI := upSum + downSum != 0 ? (upSum - downSum) / (upSum + downSum) : nz(tmpRSI[1])
+
+if tmpRSI > 0.999
+    tmpRSI := 0.999
+if tmpRSI < -0.999
+    tmpRSI := -0.999
+
+float quickRSI = 0.5 * math.log((1 + tmpRSI) / (1 - tmpRSI))
+quickRSI := applyNormalization ? quickRSI * 25 : quickRSI
+
+float overboughtLevel = applyNormalization ? obosLevel * 25 : obosLevel
+float oversoldLevel = applyNormalization ? obosLevel * -25 : obosLevel * -1
+
+color quickRSIColor = quickRSI > overboughtLevel ? color.green : quickRSI < oversoldLevel ? color.red : color.new(#c3c3c3, 15)
+
+plot(quickRSI, "RRSI", color=quickRSIColor, linewidth=2)
+plot(overboughtLevel, "OB Level", style=plot.style_circles, color=color.new(#00ff00, 80))
+hline(0, "Zero Level", linestyle=hline.style_dotted)
+plot(oversoldLevel, "OS Level", style=plot.style_circles, color=color.new(#ff0000, 80))
