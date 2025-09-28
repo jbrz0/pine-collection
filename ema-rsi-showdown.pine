@@ -1,6 +1,11 @@
 //@version=6
 indicator("EMA RSI Showdown v6", overlay=true)
 
+// Blends momentum (MACD-style EMA spread), structure (EMA box), and an EMA’d RSI for signals.
+// RSI extremes set bias, MACD flip confirms, and entries trigger only with price above/below the box.
+// Good on intraday futures/crypto where momentum rotations are frequent. Avoid during major news or flat sessions.
+// If two of three conditions disagree, stand aside to avoid forced trades.
+
 // MACD Crossover
 int fastLength = input.int(8, minval=1, title="Fast Length")
 int slowLength = input.int(16, minval=1, title="Slow Length")
@@ -17,16 +22,13 @@ pos := signal < macd ? 1 : signal > macd ? -1 : nz(pos[1], 0)
 bool MACDcrossover = pos == 1 and pos[1] == -1
 bool MACDcrossunder = pos == -1 and pos[1] == 1
 
-
 // Buy/Sell Boxes
 int boxLen = input.int(8, minval=1, title="Box Length")
 // FIXED: Replaced invalid 'source' keyword with 'float'.
 float boxSrc = input.source(close, title="Box Source")
 float boxOut = ta.ema(boxSrc, boxLen)
 
-
 // RSI EMA Oscillator
-// FIXED: Replaced invalid 'source' keyword with 'float'.
 float src = close
 int rsiLen = input.int(14, minval=1, title="RSI Length")
 int emaRsiLen = input.int(12, minval=1, title="EMA of RSI Length")
@@ -38,12 +40,10 @@ float emaRSI = ta.ema(rsi, emaRsiLen)
 bool emaRSISell = emaRSI > 66
 bool emaRSIBuy = emaRSI < 33
 
-
 // Final Buy/Sell signal arguments
 bool longSignal = emaRSIBuy and MACDcrossover and close >= boxOut
 bool shortSignal = emaRSISell and MACDcrossunder and close < boxOut
 bool mixedAlert = longSignal or shortSignal
-
 
 // Plot Buy/Sell signal arrows
 plotshape(series=shortSignal, title="Sell Signal", style=shape.arrowdown, location=location.bottom, color=#FF5252, text="Sell", size=size.small)

@@ -1,7 +1,12 @@
 //@version=6
-indicator("Moving Averages (v6)", overlay=true)
+indicator("Moving Averages", overlay=true)
 
-// ── EMA 20 ─────────────────────────────────────────────────────────────────────
+// Bread-and-butter trend map: EMA 20/50 for momentum, SMA 100/200 for structure.
+// 20/50 crosses hint at shifts; price relative to 100/200 signals higher-timeframe bias.
+// Great for everything liquid—equities, FX, crypto. Cleanest on 1h+; on lower TFs, expect more noise.
+// Respect the slope: flat MAs usually mean the market owes nothing.
+
+// ── EMA 20 
 ema20_len   = input.int(20,    title="EMA 20 • Length", minval=1, group="EMA 20")
 ema20_col   = input.color(#e1bee7, title="EMA 20 • Color", group="EMA 20")
 ema20_w     = input.int(1,     title="EMA 20 • Width", minval=1, maxval=5, group="EMA 20")
@@ -11,7 +16,7 @@ ema20_style = ema20_style_opt == "Line" ? plot.style_line :
               ema20_style_opt == "Step Line" ? plot.style_stepline :
               plot.style_area
 
-// ── EMA 50 ─────────────────────────────────────────────────────────────────────
+// ── EMA 50 
 ema50_len   = input.int(50,    title="EMA 50 • Length", minval=1, group="EMA 50")
 ema50_col   = input.color(#ba68c8, title="EMA 50 • Color", group="EMA 50")
 ema50_w     = input.int(1,     title="EMA 50 • Width", minval=1, maxval=5, group="EMA 50")
@@ -21,7 +26,7 @@ ema50_style = ema50_style_opt == "Line" ? plot.style_line :
               ema50_style_opt == "Step Line" ? plot.style_stepline :
               plot.style_area
 
-// ── SMA 100 ────────────────────────────────────────────────────────────────────
+// ── SMA 100 
 sma100_len  = input.int(100,   title="SMA 100 • Length", minval=1, group="SMA 100")
 sma100_col  = input.color(#7b1fa2, title="SMA 100 • Color", group="SMA 100")
 sma100_w    = input.int(3,     title="SMA 100 • Width", minval=1, maxval=5, group="SMA 100")
@@ -31,7 +36,7 @@ sma100_style = sma100_style_opt == "Line" ? plot.style_line :
                sma100_style_opt == "Step Line" ? plot.style_stepline :
                plot.style_area
 
-// ── SMA 200 ────────────────────────────────────────────────────────────────────
+// ── SMA 200 
 sma200_len  = input.int(200,   title="SMA 200 • Length", minval=1, group="SMA 200")
 sma200_col  = input.color(#4a148c, title="SMA 200 • Color", group="SMA 200")
 sma200_w    = input.int(3,     title="SMA 200 • Width", minval=1, maxval=5, group="SMA 200")
@@ -41,13 +46,13 @@ sma200_style = sma200_style_opt == "Line" ? plot.style_line :
                sma200_style_opt == "Step Line" ? plot.style_stepline :
                plot.style_area
 
-// ── Calcs ──────────────────────────────────────────────────────────────────────
+// ── Calcs 
 ema20   = ta.ema(close, ema20_len)
 ema50   = ta.ema(close, ema50_len)
 sma100  = ta.sma(close, sma100_len)
 sma200  = ta.sma(close, sma200_len)
 
-// ── Plots ──────────────────────────────────────────────────────────────────────
+// ── Plots 
 plot(ema20,  title="EMA 20",  color=ema20_col,  linewidth=ema20_w,  style=ema20_style)
 plot(ema50,  title="EMA 50",  color=ema50_col,  linewidth=ema50_w,  style=ema50_style)
 plot(sma100, title="SMA 100", color=sma100_col, linewidth=sma100_w, style=sma100_style)

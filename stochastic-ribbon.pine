@@ -1,6 +1,11 @@
 //@version=6
 indicator("Stochastic Ribbon", shorttitle="SR", overlay=true)
 
+// A layered look at rolling highs/lows—think multiple stochastic envelopes as a visual ribbon.
+// Compression/expansion and ribbon flips help read momentum regimes and potential breakouts.
+// Pairs well with price action on 15m–4h across assets. If all lines flatten, expect range.
+// Read it like a heatmap: more alignment means higher conviction.
+
 // --- Inputs ---
 theme = input.string("Theme 2", "Theme", options=["Theme 1", "Theme 2", "Theme 3"])
 length = input.int(14, "Length", minval=1)

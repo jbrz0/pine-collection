@@ -1,6 +1,11 @@
 //@version=6
 indicator("Quick RSI", shorttitle="Quick RSI")
 
+// A fast, smoothed RSI variant that reacts without being twitchy.
+// Useful for early momentum shifts, OB/OS tags, and divergence checks; solid from scalps to swing.
+// Works across assets; best on 5m–4h. Normalization helps compare symbols.
+// If it whips around the zero line, expect range and reduce risk.
+
 int rsiLength = input.int(10, "RSI Length", minval=1)
 int smoothingLength = input.int(8, "Smoothing Length", minval=1)
 float obosLevel = input.float(2.0, "Overbought / Oversold Level", minval=0.0)

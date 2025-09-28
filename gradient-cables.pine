@@ -1,0 +1,69 @@
+//@version=6
+indicator(title="Gradient Cables", overlay=true)
+
+// A gradient ribbon of layered EMAs with the 200 SMA for structure, plus multi-timeframe checks.
+// The ribbon visualizes trend health (compression/expansion and ordering), while H1 agreement filters M15 signals.
+// Square/diamond markers flag aligned trends and major trend states. Suited to indices, FX, and liquid crypto.
+// Clean on 15m–4h; in chop, expect alternating signals and reduce exposure.
+
+// Moving Averages
+
+float s5ema = ta.ema(close, 5)
+float s6ema = ta.ema(close, 6)
+float s10ema = ta.ema(close, 10)
+float s18ema = ta.ema(close, 18)
+float s20ema = ta.ema(close, 20)
+float s30ema = ta.ema(close, 30)
+float s40ema = ta.ema(close, 40)
+float s50ema = ta.ema(close, 50)
+float s60ema = ta.ema(close, 60)
+float s75ema = ta.ema(close, 75)
+float s100ema = ta.ema(close, 100)
+float s125ema = ta.ema(close, 125)
+float s150ema = ta.ema(close, 150)
+float s175ema = ta.ema(close, 175)
+float s200sma = ta.sma(close, 200)
+
+// Plot Moving Averages
+plot(s5ema, "EMA 5", color=color.new(#0000FF, 0))
+plot(s6ema, "EMA 6", color=color.new(#1E90FF, 0))
+plot(s10ema, "EMA 10", color=color.new(#00BFFF, 0))
+plot(s18ema, "EMA 18", color=color.new(#87CEEB, 0))
+plot(s20ema, "EMA 20", color=color.new(#ADD8E6, 0))
+plot(s30ema, "EMA 30", color=color.new(#E0FFFF, 0))
+plot(s40ema, "EMA 40", color=color.new(#E6E6FA, 0))
+plot(s50ema, "EMA 50", color=color.new(#DDA0DD, 0))
+plot(s60ema, "EMA 60", color=color.new(#EE82EE, 0))
+plot(s75ema, "EMA 75", color=color.new(#FF00FF, 0))
+plot(s100ema, "EMA 100", color=color.new(#FF69B4, 0))
+plot(s125ema, "EMA 125", color=color.new(#FFB6C1, 0))
+plot(s150ema, "EMA 150", color=color.new(#FFA07A, 0))
+plot(s175ema, "EMA 175", color=color.new(#FF7F50, 0))
+plot(s200sma, "SMA 200", color=color.new(#FF4500, 0))
+
+// Detect M15 Uptrend / Downtrend
+bool slightUptrend = s6ema > s18ema and s18ema > s50ema and s50ema > s200sma
+bool slightDowntrend = s6ema < s18ema and s18ema < s50ema and s50ema < s200sma
+bool MAUptrend = s5ema > s10ema and s10ema > s20ema and s20ema > s30ema and s30ema > s40ema and s40ema > s50ema and s50ema > s60ema and s60ema > s75ema and s75ema > s100ema and s100ema > s125ema and s125ema > s150ema and s150ema > s175ema and s175ema > s200sma
+bool MADowntrend = s5ema < s10ema and s10ema < s20ema and s20ema < s30ema and s30ema < s40ema and s40ema < s50ema and s50ema < s60ema and s60ema < s75ema and s75ema < s100ema and s100ema < s125ema and s125ema < s150ema and s150ema < s175ema and s175ema < s200sma
+
+// Detect H1 Uptrend / Downtrend
+bool slightUptrendH1 = request.security(syminfo.tickerid, "60", slightUptrend)
+bool slightDowntrendH1 = request.security(syminfo.tickerid, "60", slightDowntrend)
+
+// Strategy Plots
+
+bool finalUptrend = slightUptrend and slightUptrendH1
+bool finalDowntrend = slightDowntrend and slightDowntrendH1
+bool finalMajorUptrend = MAUptrend and slightUptrendH1
+bool finalMajorDowntrend = MADowntrend and slightDowntrendH1
+
+plotshape(finalUptrend, "Final Uptrend", style=shape.square, location=location.bottom, color=color.green)
+plotshape(finalDowntrend, "Final Downtrend", style=shape.square, location=location.bottom, color=color.red)
+plotshape(finalMajorUptrend, "Major Uptrend", style=shape.diamond, location=location.bottom, color=color.lime)
+plotshape(finalMajorDowntrend, "Major Downtrend", style=shape.diamond, location=location.bottom, color=color.fuchsia)
+
+// Strategy Alerts
+
+alertcondition(finalMajorUptrend, "Major Uptrend")
+alertcondition(finalMajorDowntrend, "Major Downtrend")

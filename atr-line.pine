@@ -1,6 +1,11 @@
 //@version=6
 indicator("ATR Line", overlay=true)
 
+// A simple ATR-based trailing stop that flips with price.
+// Useful as an exit and for trailing winners in trending moves; it will chop in tight ranges.
+// Good for futures, FX, and liquid crypto pairs. On lower timeframes, consider a smaller multiplier.
+// If price hugs the line without follow-through, tighten risk or avoid engagement.
+
 int nATRPeriod = input.int(5, "ATR Period")
 float nATRMultip = input.float(3.5, "ATR Multiplier")
 

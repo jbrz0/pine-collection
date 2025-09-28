@@ -1,0 +1,17 @@
+//@version=6
+indicator("Disparity Index", shorttitle="DI")
+
+// Measures how stretched price is from its moving average in percent terms.
+// Extreme positive/negative readings suggest mean reversion in ranges; in strong trends, helps avoid chasing.
+// Useful for equities and crypto where mean-reversion windows appear. Works on 15m–daily.
+// If the index stays pinned, trend momentum is strong.
+
+int length = input.int(14, "Length", minval=1)
+src = input.source(close, "Source")
+
+float di = 100 * (src - ta.sma(src, length)) / ta.sma(src, length)
+
+color diColor = di >= 0.0 ? color.new(#0ebb23, 0) : color.new(#ff0000, 0)
+
+plot(di, "Disparity Index", color=diColor, linewidth=2)
+hline(0, "Zero Level", linestyle=hline.style_dotted, color=color.new(#989898, 0))

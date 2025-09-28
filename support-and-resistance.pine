@@ -1,6 +1,11 @@
 //@version=6
 indicator("Support & Resistance Lines", overlay=true)
 
+// Draws recent swing levels and projects them forward. Simple, readable S/R.
+// Use for planning: buy pullbacks into support in uptrends, fade into resistance in ranges.
+// Works on any liquid market; higher TFs earn more respect. Quick pivots help on intraday.
+// If price keeps slicing through a level, treat it as noise.
+
 // --- Inputs ---
 left = input.int(50, "Left Bars")
 right = input.int(25, "Right Bars")
@@ -46,8 +51,3 @@ updateLine(l3, pivotHighPrice)
 updateLine(l4, pivotLowPrice)
 updateLine(l1, quickPivotHighPrice)
 updateLine(l2, quickPivotLowPrice)
-
-// Note: Getting the 2nd or 3rd most recent pivot directly like in v3/v5 
-// (e.g., valuewhen(pivothigh, close[right], 1)) is more complex in v6's drawing-focused model.
-// The code above correctly plots the most recent pivots. Plotting historical ones 
-// requires a more advanced array-based approach to store and manage previous pivot levels.

@@ -1,9 +1,16 @@
 //@version=6
 indicator("ADX & DI", shorttitle="ADX & DI", overlay=false)
+
+// ADX gauges trend strength while +DI/-DI suggests direction.
+// ADX above the threshold implies a trend worth riding; below it, expect chop.
+// Works well on FX, indices, and major crypto. Cleaner on 1h+ but usable intraday.
+// DI crosses aid timing and the ADX slope adds conviction; avoid over-trading in ranges.
+
 // Input parameters
 int adxlen = input.int(14, title="ADX Smoothing")
 int dilen = input.int(14, title="DI Length")
 int threshold = input.int(20, title="Threshold")
+
 // Function to calculate Directional Movement
 dirmov(len) =>
     up = ta.change(high)
@@ -14,12 +21,14 @@ dirmov(len) =>
     plus = na(100 * ta.rma(plusDM, len) / truerange) ? 0 : 100 * ta.rma(plusDM, len) / truerange
     minus = na(100 * ta.rma(minusDM, len) / truerange) ? 0 : 100 * ta.rma(minusDM, len) / truerange
     [plus, minus]
+
 // Function to calculate ADX
 adx(dilen, adxlen) =>
     [plusDI, minusDI] = dirmov(dilen)
     sum = plusDI + minusDI
     adxVal = 100 * ta.rma(math.abs(plusDI - minusDI) / (sum == 0 ? 1 : sum), adxlen)
     adxVal
+
 // Calculate indicators
 [plusDI, minusDI] = dirmov(dilen)
 adxValue = adx(dilen, adxlen)
