@@ -3,7 +3,7 @@ indicator("Moving Averages", overlay=true)
 
 // Bread-and-butter trend map: EMA 20/50 for momentum, SMA 100/200 for structure.
 // 20/50 crosses hint at shifts; price relative to 100/200 signals higher-timeframe bias.
-// Great for everything liquid—equities, FX, crypto. Cleanest on 1h+; on lower TFs, expect more noise.
+// Great for everything liquid equities, FX, crypto. Cleanest on 1h+; on lower TFs, expect more noise.
 // Respect the slope: flat MAs usually mean the market owes nothing.
 
 // ── EMA 20 

@@ -4,7 +4,7 @@ indicator("Smooth SAR", shorttitle="Smooth SAR", overlay=true)
 // A gentler take on Parabolic SAR to track swings without the usual jitter.
 // Trails trends and flags flips to mark exhaustion or regime change.
 // Best on trending symbols (indices, FX majors). On low‑TF chop, reduce AF or skip.
-// Clustered flips indicate indecision—trade lighter.
+// Clustered flips indicate indecision, trade lighter.
 
 // --- Inputs ---
 AF_initial = input.float(0.02, "AF Initial")

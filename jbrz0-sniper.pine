@@ -4,7 +4,7 @@ indicator("jbrz0 sniper", overlay=true, shorttitle="jbrz0snipe")
 // A "take the clean break" tool: TEMA/DEMA momentum arrows plus a lightweight Supertrend flip, with optional channel and S/R context.
 // Entry arrows are most reliable when the Supertrend agrees; EMA color helps avoid counter‑trend pokes.
 // Shines on intraday indices and active crypto pairs. In choppy conditions, throttle size or stand down.
-// Treat it as a trigger, not a full system—risk and context still matter.
+// Treat it as a trigger, not a full system, risk and context still matter.
 
 // —————— Inputs ——————
 // Channel
